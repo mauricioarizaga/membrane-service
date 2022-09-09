@@ -1,0 +1,14 @@
+{
+  "name": "membrane-microservices",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "git add . && git commit -m -- && git push aws develop",
+    "update": "git submodule foreach 'git add . && git commit -m develop && git push origin develop'"
+  },
+  "keywords": [],
+  "author": "Mauricio Arizaga",
+  "license": "ISC"
+}
