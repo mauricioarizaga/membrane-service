@@ -6,7 +6,6 @@ import { Transport } from '@nestjs/microservices';
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import { join } from 'path';
-import { bitfinexWSStart } from './market/utils/connectWS';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -38,7 +37,6 @@ async function bootstrap() {
   });
   app.useStaticAssets(join(__dirname, '..', 'src', 'static'));
   app.startAllMicroservices();
-  await bitfinexWSStart();
   await app.listen(process.env.API_PORT, async () => {
     console.log(`Running on port: ${process.env.API_PORT}`);
   });
