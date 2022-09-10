@@ -1,0 +1,34 @@
+version: "3.8"
+services:
+  apache:
+    image: "bitnami/apache:latest"
+    networks:
+      membrane-network:
+        aliases:
+          - apache
+    ports:
+      - "80:8080"
+      - "443:8443"
+    volumes:
+      - ./vhost_httpd.conf:/vhosts/vhost.conf:ro
+  status-market-service:
+    build:
+      context: ./status-market-service
+    restart: always
+    env_file:
+      - .env
+    expose:
+      - 3000
+    networks:
+      membrane-network:
+        aliases:
+          - status-market-service
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+networks:
+  membrane-network:
+    driver: bridge
