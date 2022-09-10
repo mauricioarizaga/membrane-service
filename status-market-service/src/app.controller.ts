@@ -1,11 +1,11 @@
 import { Controller, Get } from '@nestjs/common';
 
-@Controller('health')
+@Controller()
 export class AppController {
   constructor() {}
 
-  @Get()
-  getHealth() {
-    return { status: 'running', message: 'health ok' };
+  @Get('health')
+  getRoot() {
+    return { status: 'running', message: '@Membrane' };
   }
 }
