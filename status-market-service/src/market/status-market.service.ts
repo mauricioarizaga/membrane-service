@@ -1,4 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
+import { arrayDataWS } from '../environments/config';
 import { StatusMarketRepository } from './status-market.repository';
 const twoMonths = 1000 * 60 * 60 * 24 * 60;
 
@@ -31,6 +32,16 @@ export class StatusMarketService {
       );
 
       return response;
+    } catch (error) {
+      throw new HttpException(error, error?.response?.statusCode || 500);
+    }
+  }
+
+  async getDataWS(data) {
+    try {
+      arrayDataWS.push(data);
+      const newSetArrayDataWS = new Set(arrayDataWS);
+      console.log(newSetArrayDataWS, 'set');
     } catch (error) {
       throw new HttpException(error, error?.response?.statusCode || 500);
     }
