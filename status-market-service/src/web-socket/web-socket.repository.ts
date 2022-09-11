@@ -1,14 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as WebSocket from 'ws';
 import { timer } from 'rxjs';
 import { bitfinexData, pairBTCUSD, pairETHUSD } from '../environments/config';
+import { StatusMarketService } from '../market/status-market.service';
 
 @Injectable()
 export class WSRepository {
   private ws: WebSocket;
   private isConnect = false;
 
-  constructor() {
+  constructor(private statusMarketService: StatusMarketService) {
     this.connect();
   }
   connect() {
@@ -32,8 +33,9 @@ export class WSRepository {
       });
     });
 
-    this.ws.on('message', (message) => {
-      console.log(message.toString());
+    this.ws.on('message', async (message) => {
+      Logger.verbose({ data: message.toString() });
+      this.statusMarketService.getDataWS(message.toString());
     });
   }
 

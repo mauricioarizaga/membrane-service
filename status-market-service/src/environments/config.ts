@@ -29,3 +29,4 @@ export const pairETHUSD = JSON.stringify({
   freq: frecuency1,
   len: Number(length100),
 });
+export const arrayDataWS = [];
