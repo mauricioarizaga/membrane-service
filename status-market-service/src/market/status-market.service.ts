@@ -36,6 +36,7 @@ export class StatusMarketService {
       throw new HttpException(error, error?.response?.statusCode || 500);
     }
   }
+
   async getDataWS(data) {
     try {
       arrayDataWS.push(data);

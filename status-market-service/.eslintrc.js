@@ -9,6 +9,7 @@ module.exports = {
   extends: [
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
+
   ],
   root: true,
   env: {
@@ -16,7 +17,6 @@ module.exports = {
     jest: true,
   },
   ignorePatterns: ['.eslintrc.js'],
-
   files: ['*.ts', '*.tsx'],
   extends: ['plugin:@nrwl/nx/typescript'],
   rules: {
