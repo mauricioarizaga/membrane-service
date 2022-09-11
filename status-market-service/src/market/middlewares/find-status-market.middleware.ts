@@ -13,7 +13,7 @@ export class GetStatusMarketMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction) {
     try {
-      const query = { hola: 'hola' };
+      /*   const query = { hola: 'hola' };
       const errors = await validate(query);
       if (errors.length > 0) {
         res.status(500).json({
@@ -22,7 +22,8 @@ export class GetStatusMarketMiddleware implements NestMiddleware {
           code: 500,
         });
         return;
-      }
+      } */
+      next();
     } catch (error) {
       throw new HttpException(error, error?.response?.statusCode || 500);
     }

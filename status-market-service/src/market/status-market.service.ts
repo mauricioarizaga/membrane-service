@@ -1,47 +1,20 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { arrayDataWS } from '../environments/config';
-import { StatusMarketRepository } from './status-market.repository';
-const twoMonths = 1000 * 60 * 60 * 24 * 60;
+import { WSService } from '../web-socket/web-socket.service';
 
 @Injectable()
 export class StatusMarketService {
-  constructor(
-    private readonly statusMarketRepository: StatusMarketRepository,
-  ) {}
-
+  constructor(private wsService: WSService) {}
   async getStatusMarket(from: string, to: string) {
     try {
-      const today = new Date();
-      const todayIso = today.toISOString();
-      const substractDays = today.getTime() - twoMonths;
-      const dateTwoMonthsAgo = new Date(substractDays).toISOString();
-      const select = ['from', 'to', 'message', 'createdAt'];
-      const sort = { createdAt: 1 };
-      const queryData = {
-        from: [from, to],
-        to: [from, to],
-        createdAt: {
-          $gte: dateTwoMonthsAgo,
-          $lt: todayIso,
-        },
-      };
-      const response = await this.statusMarketRepository.getstatusMarket(
-        queryData,
-        select,
-        sort,
-      );
-
-      return response;
+      await this.wsService.sendConnectWS(from, to);
+      return await this.getDataWS();
     } catch (error) {
       throw new HttpException(error, error?.response?.statusCode || 500);
     }
   }
-
-  async getDataWS(data) {
+  async getDataWS() {
     try {
-      arrayDataWS.push(data);
-      const newSetArrayDataWS = new Set(arrayDataWS);
-      console.log(newSetArrayDataWS, 'set');
+      return await this.wsService.getDataWS();
     } catch (error) {
       throw new HttpException(error, error?.response?.statusCode || 500);
     }

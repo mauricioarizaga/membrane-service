@@ -1,24 +1,30 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  CacheInterceptor,
+  UseInterceptors,
+  CacheTTL,
+  CacheKey,
+  CACHE_MANAGER,
+  Inject,
+} from '@nestjs/common';
+import { Cache } from 'cache-manager';
 import * as WebSocket from 'ws';
-import { timer } from 'rxjs';
-import { bitfinexData, pairBTCUSD, pairETHUSD } from '../environments/config';
-import { StatusMarketService } from '../market/status-market.service';
+import { bitfinexData, pairName } from '../environments/config';
 
 @Injectable()
+@UseInterceptors(CacheInterceptor)
+@CacheTTL(30)
+@CacheKey('pair-key')
 export class WSRepository {
   private ws: WebSocket;
   private isConnect = false;
-
-  constructor(private statusMarketService: StatusMarketService) {
-    this.connect();
-  }
-  connect() {
+  private arrayMessage = [];
+  constructor(@Inject(CACHE_MANAGER) private cacheService: Cache) {}
+  async connect(from: string, to: string) {
     this.ws = new WebSocket(bitfinexData.apiUrl);
-    this.ws.on('open', () => {
+    this.ws.on('open', async () => {
       this.isConnect = true;
-      console.log(pairBTCUSD, pairETHUSD);
-      this.ws.send(pairBTCUSD);
-      this.ws.send(pairETHUSD);
+      await this.ws.send(pairName(from, to));
     });
 
     this.ws.on('error', (message) => {
@@ -27,18 +33,26 @@ export class WSRepository {
     });
 
     this.ws.on('close', (message) => {
-      timer(1000).subscribe(() => {
-        this.isConnect = false;
-        this.connect();
-      });
-    });
-
-    this.ws.on('message', async (message) => {
-      Logger.verbose({ data: message.toString() });
-      this.statusMarketService.getDataWS(message.toString());
+      this.isConnect = false;
     });
   }
+  async getDateWS() {
+    this.ws.on('message', async (message) => {
+      let messageParsed = JSON.parse(message.toString());
 
+      this.arrayMessage.push(messageParsed[messageParsed.length - 1]);
+      setTimeout(() => {
+        this.ws.close();
+      }, 2000);
+      let id = messageParsed.length + Math.floor(Math.random() * 1000);
+      await this.cacheService.set(
+        id.toString(),
+        messageParsed[messageParsed.length - 1],
+      );
+      const cachedData = await this.cacheService.get(id.toString());
+      return this.arrayMessage;
+    });
+  }
   getIsConnect() {
     return this.isConnect;
   }

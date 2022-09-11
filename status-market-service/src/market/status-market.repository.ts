@@ -1,4 +1,5 @@
 import { HttpException, Injectable, Inject } from '@nestjs/common';
+import { WSRepository } from '../web-socket/web-socket.repository';
 
 @Injectable()
 export class StatusMarketRepository {
