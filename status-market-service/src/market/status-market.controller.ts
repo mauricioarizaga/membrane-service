@@ -8,7 +8,8 @@ export class StatusMarketController {
 
   @Get()
   async statusMarket(@Query() pair: PairNameDTO) {
-    const { from, to } = pair;
+    const from = pair.from.toUpperCase();
+    const to = pair.to.toUpperCase();
     return await this.statusMarketService.getStatusMarket(from, to);
   }
 }

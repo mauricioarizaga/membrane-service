@@ -16,7 +16,7 @@ services:
     environment:
       - REDIS_PASSWORD=mauricio
       - REDIS_PORT_NUMBER=7000
-    command: /opt/bitnami/scripts/redis/run.sh --maxmemory 100mb
+    command: /opt/bitnami/scripts/redis/run.sh --maxmemory 50mb
     ports:
       - "7000:7000"
     networks:
