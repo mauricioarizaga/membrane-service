@@ -1,20 +1,13 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { WSService } from '../web-socket/web-socket.service';
+import { StatusMarketRepository } from './status-market.repository';
 
 @Injectable()
 export class StatusMarketService {
-  constructor(private wsService: WSService) {}
+  constructor(private statusMarketRepository: StatusMarketRepository) {}
   async getStatusMarket(from: string, to: string) {
     try {
-      await this.wsService.sendConnectWS(from, to);
-      return await this.getDataWS();
-    } catch (error) {
-      throw new HttpException(error, error?.response?.statusCode || 500);
-    }
-  }
-  async getDataWS() {
-    try {
-      return await this.wsService.getDataWS();
+      const getPair = from.concat(to);
+      return await this.statusMarketRepository.getstatusMarket(getPair);
     } catch (error) {
       throw new HttpException(error, error?.response?.statusCode || 500);
     }

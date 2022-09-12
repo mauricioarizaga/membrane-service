@@ -11,6 +11,18 @@ services:
       - "443:8443"
     volumes:
       - ./vhost_httpd.conf:/vhosts/vhost.conf:ro
+  redis:
+    image: "bitnami/redis:latest"
+    environment:
+      - REDIS_PASSWORD=mauricio
+      - REDIS_PORT_NUMBER=7000
+    command: /opt/bitnami/scripts/redis/run.sh --maxmemory 100mb
+    ports:
+      - "7000:7000"
+    networks:
+      membrane-network:
+        aliases:
+          - redis-service
   status-market-service:
     build:
       context: ./status-market-service

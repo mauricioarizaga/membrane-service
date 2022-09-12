@@ -16,14 +16,25 @@ const [BTCUSD, ETHUSD] = process.env.BITFINEX_PAIR.split(',');
 export const bitfinexData = {
   apiUrl: process.env.BITFINEX_WS_URL,
 };
-export const pairName = (from?: string, to?: string) => {
-  const symbol = 't'.concat(from, to);
-  return JSON.stringify({
-    event: process.env.BITFINEX_EVENT,
-    channel: book,
-    symbol,
-    prec: precision0,
-    freq: frecuency1,
-    len: Number(length25),
-  });
+export const pairNameBTCUSD = JSON.stringify({
+  event: process.env.BITFINEX_EVENT,
+  channel: book,
+  symbol: 't'.concat(BTCUSD),
+  prec: precision0,
+  freq: frecuency1,
+  len: Number(length25),
+});
+
+export const pairNameETHUSD = JSON.stringify({
+  event: process.env.BITFINEX_EVENT,
+  channel: book,
+  symbol: 't'.concat(ETHUSD),
+  prec: precision0,
+  freq: frecuency1,
+  len: Number(length25),
+});
+console.log(BTCUSD, ETHUSD);
+export const allPairNames = {
+  BTCUSD,
+  ETHUSD,
 };
