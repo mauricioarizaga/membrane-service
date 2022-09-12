@@ -33,7 +33,6 @@ export const pairNameETHUSD = JSON.stringify({
   freq: frecuency1,
   len: Number(length25),
 });
-console.log(BTCUSD, ETHUSD);
 export const allPairNames = {
   BTCUSD,
   ETHUSD,

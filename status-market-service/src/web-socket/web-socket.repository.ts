@@ -34,7 +34,6 @@ export class WSRepository {
         chanIdBTCUSD = Number(messageParsed.chanId);
       }
       if (messageParsed.chanId && messageParsed.pair === allPairNames.ETHUSD) {
-        console.log('ETH');
         chanIdETHUSD = Number(messageParsed.chanId);
       }
       if (
