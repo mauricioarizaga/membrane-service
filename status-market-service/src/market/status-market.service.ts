@@ -1,47 +1,35 @@
-import { HttpException, Injectable } from '@nestjs/common';
-import { arrayDataWS } from '../environments/config';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { hbValues } from '../environments/config';
 import { StatusMarketRepository } from './status-market.repository';
-const twoMonths = 1000 * 60 * 60 * 24 * 60;
 
 @Injectable()
 export class StatusMarketService {
-  constructor(
-    private readonly statusMarketRepository: StatusMarketRepository,
-  ) {}
-
+  constructor(private statusMarketRepository: StatusMarketRepository) {}
   async getStatusMarket(from: string, to: string) {
     try {
-      const today = new Date();
-      const todayIso = today.toISOString();
-      const substractDays = today.getTime() - twoMonths;
-      const dateTwoMonthsAgo = new Date(substractDays).toISOString();
-      const select = ['from', 'to', 'message', 'createdAt'];
-      const sort = { createdAt: 1 };
-      const queryData = {
-        from: [from, to],
-        to: [from, to],
-        createdAt: {
-          $gte: dateTwoMonthsAgo,
-          $lt: todayIso,
-        },
-      };
-      const response = await this.statusMarketRepository.getstatusMarket(
-        queryData,
-        select,
-        sort,
+      const getPair = from.concat(to);
+      const getData = await this.statusMarketRepository.getstatusMarket(
+        getPair,
       );
-
-      return response;
-    } catch (error) {
-      throw new HttpException(error, error?.response?.statusCode || 500);
-    }
-  }
-
-  async getDataWS(data) {
-    try {
-      arrayDataWS.push(data);
-      const newSetArrayDataWS = new Set(arrayDataWS);
-      console.log(newSetArrayDataWS, 'set');
+      if (!getData || getData === hbValues) {
+        throw new NotFoundException('Data Not Found, please try again' || 404);
+      }
+      if (getData.length === 3) {
+        return {
+          price: getData[0],
+          bidAsk: getData[2] > 0 ? 'bid' : 'ask',
+          totalAmount: getData[2],
+          orders: getData[1],
+        };
+      }
+      if (getData.length !== 3) {
+        return {
+          price: getData[getData.length - 1][0],
+          bidAsk: getData[getData.length - 1][2] > 0 ? 'bid' : 'ask',
+          totalAmount: getData[getData.length - 1][2],
+          orders: getData[getData.length - 1][1],
+        };
+      }
     } catch (error) {
       throw new HttpException(error, error?.response?.statusCode || 500);
     }

@@ -1,45 +1,73 @@
-import { Injectable, Logger } from '@nestjs/common';
-import * as WebSocket from 'ws';
+import { Injectable } from '@nestjs/common';
+import { Inject, CACHE_MANAGER } from '@nestjs/common';
+import Cache from 'cache-manager';
 import { timer } from 'rxjs';
-import { bitfinexData, pairBTCUSD, pairETHUSD } from '../environments/config';
-import { StatusMarketService } from '../market/status-market.service';
-
+import * as WebSocket from 'ws';
+import {
+  allPairNames,
+  bitfinexData,
+  pairNameBTCUSD,
+  pairNameETHUSD,
+} from '../environments/config';
+let chanIdBTCUSD: number;
+let chanIdETHUSD: number;
 @Injectable()
 export class WSRepository {
   private ws: WebSocket;
   private isConnect = false;
+  private oneMs = 1000;
 
-  constructor(private statusMarketService: StatusMarketService) {
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {
     this.connect();
   }
-  connect() {
+  async connect() {
     this.ws = new WebSocket(bitfinexData.apiUrl);
-    this.ws.on('open', () => {
+    this.ws.on('open', async () => {
       this.isConnect = true;
-      console.log(pairBTCUSD, pairETHUSD);
-      this.ws.send(pairBTCUSD);
-      this.ws.send(pairETHUSD);
+      await this.ws.send(pairNameBTCUSD);
+      await this.ws.send(pairNameETHUSD);
     });
-
+    this.ws.on('message', async (message) => {
+      let messageParsed = JSON.parse(message.toString());
+      if (messageParsed.chanId && messageParsed.pair === allPairNames.BTCUSD) {
+        chanIdBTCUSD = Number(messageParsed.chanId);
+      }
+      if (messageParsed.chanId && messageParsed.pair === allPairNames.ETHUSD) {
+        chanIdETHUSD = Number(messageParsed.chanId);
+      }
+      if (
+        Array.isArray(messageParsed) &&
+        messageParsed.includes(chanIdBTCUSD)
+      ) {
+        await this.cacheManager.set(
+          allPairNames.BTCUSD,
+          messageParsed[messageParsed.length - 1],
+          {
+            ttl: bitfinexData.ttl,
+          },
+        );
+      }
+      if (
+        Array.isArray(messageParsed) &&
+        messageParsed.includes(chanIdETHUSD)
+      ) {
+        await this.cacheManager.set(
+          allPairNames.ETHUSD,
+          messageParsed[messageParsed.length - 1],
+          {
+            ttl: bitfinexData.ttl,
+          },
+        );
+      }
+    });
     this.ws.on('error', (message) => {
-      this.ws.close();
-      this.isConnect = false;
-    });
-
-    this.ws.on('close', (message) => {
-      timer(1000).subscribe(() => {
+      timer(this.oneMs).subscribe(() => {
         this.isConnect = false;
         this.connect();
       });
     });
-
-    this.ws.on('message', async (message) => {
-      Logger.verbose({ data: message.toString() });
-      this.statusMarketService.getDataWS(message.toString());
+    this.ws.on('close', (message) => {
+      this.isConnect = false;
     });
-  }
-
-  getIsConnect() {
-    return this.isConnect;
   }
 }

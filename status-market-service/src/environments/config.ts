@@ -1,6 +1,9 @@
 import { config } from 'dotenv';
 config();
-const [precision0, precision1, precision2, precision3, precision4] =
+
+const [book, status] = process.env.BITFINEX_CHANNEL.split(',');
+
+const [precision0, precision1, precision2, precision3, precision4, raw0] =
   process.env.BITFINEX_PRECISION.split(',');
 
 const [length1, length25, length100, length250] =
@@ -12,21 +15,27 @@ const [BTCUSD, ETHUSD] = process.env.BITFINEX_PAIR.split(',');
 
 export const bitfinexData = {
   apiUrl: process.env.BITFINEX_WS_URL,
+  ttl: 10,
 };
-export const pairBTCUSD = JSON.stringify({
+export const pairNameBTCUSD = JSON.stringify({
   event: process.env.BITFINEX_EVENT,
-  channel: process.env.BITFINEX_CHANNEL,
+  channel: book,
   symbol: 't'.concat(BTCUSD),
-  prec: precision3,
+  prec: precision0,
   freq: frecuency1,
   len: Number(length25),
 });
-export const pairETHUSD = JSON.stringify({
+
+export const pairNameETHUSD = JSON.stringify({
   event: process.env.BITFINEX_EVENT,
-  channel: process.env.BITFINEX_CHANNEL,
+  channel: book,
   symbol: 't'.concat(ETHUSD),
-  prec: precision2,
+  prec: precision0,
   freq: frecuency1,
-  len: Number(length100),
+  len: Number(length25),
 });
-export const arrayDataWS = [];
+export const allPairNames = {
+  BTCUSD,
+  ETHUSD,
+};
+export const hbValues = 'hb';
