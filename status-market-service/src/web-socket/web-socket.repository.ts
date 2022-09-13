@@ -15,8 +15,7 @@ let chanIdETHUSD: number;
 export class WSRepository {
   private ws: WebSocket;
   private isConnect = false;
-  private arrayMessageBTCUSD = [];
-  private arrayMessageETHUSD = [];
+  private oneMs = 1000;
 
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {
     this.connect();
@@ -40,12 +39,11 @@ export class WSRepository {
         Array.isArray(messageParsed) &&
         messageParsed.includes(chanIdBTCUSD)
       ) {
-        this.arrayMessageBTCUSD.push(messageParsed[messageParsed.length - 1]);
         await this.cacheManager.set(
           allPairNames.BTCUSD,
-          this.arrayMessageBTCUSD,
+          messageParsed[messageParsed.length - 1],
           {
-            ttl: 10000,
+            ttl: bitfinexData.ttl,
           },
         );
       }
@@ -53,18 +51,17 @@ export class WSRepository {
         Array.isArray(messageParsed) &&
         messageParsed.includes(chanIdETHUSD)
       ) {
-        this.arrayMessageETHUSD.push(messageParsed[messageParsed.length - 1]);
         await this.cacheManager.set(
           allPairNames.ETHUSD,
-          this.arrayMessageETHUSD,
+          messageParsed[messageParsed.length - 1],
           {
-            ttl: 10000,
+            ttl: bitfinexData.ttl,
           },
         );
       }
     });
     this.ws.on('error', (message) => {
-      timer(1000).subscribe(() => {
+      timer(this.oneMs).subscribe(() => {
         this.isConnect = false;
         this.connect();
       });

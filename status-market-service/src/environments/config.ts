@@ -15,6 +15,7 @@ const [BTCUSD, ETHUSD] = process.env.BITFINEX_PAIR.split(',');
 
 export const bitfinexData = {
   apiUrl: process.env.BITFINEX_WS_URL,
+  ttl: 10,
 };
 export const pairNameBTCUSD = JSON.stringify({
   event: process.env.BITFINEX_EVENT,
@@ -37,3 +38,4 @@ export const allPairNames = {
   BTCUSD,
   ETHUSD,
 };
+export const hbValues = 'hb';
