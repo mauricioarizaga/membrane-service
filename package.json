@@ -10,11 +10,5 @@
   },
   "keywords": [],
   "author": "Mauricio Arizaga",
-  "license": "ISC",
-  "dependencies": {
-    "cache-manager": "^4.1.0"
-  },
-  "devDependencies": {
-    "@types/cache-manager": "^4.0.2"
-  }
+  "license": "ISC"
 }
