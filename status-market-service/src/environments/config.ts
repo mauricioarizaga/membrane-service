@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 config();
 
-const [book, status] = process.env.BITFINEX_CHANNEL.split(',');
+const [book, status, trades] = process.env.BITFINEX_CHANNEL.split(',');
 
 const [precision0, precision1, precision2, precision3, precision4, raw0] =
   process.env.BITFINEX_PRECISION.split(',');
@@ -15,8 +15,9 @@ const [BTCUSD, ETHUSD] = process.env.BITFINEX_PAIR.split(',');
 
 export const bitfinexData = {
   apiUrl: process.env.BITFINEX_WS_URL,
-  ttl: 10,
+  ttl: 20,
 };
+
 export const pairNameBTCUSD = JSON.stringify({
   event: process.env.BITFINEX_EVENT,
   channel: book,
@@ -34,8 +35,42 @@ export const pairNameETHUSD = JSON.stringify({
   freq: frecuency1,
   len: Number(length25),
 });
+
+export const tradePairBTCUSD = JSON.stringify({
+  event: process.env.BITFINEX_EVENT,
+  channel: trades,
+  symbol: 't'.concat(BTCUSD),
+});
+
+export const tradePairETHUSD = JSON.stringify({
+  event: process.env.BITFINEX_EVENT,
+  channel: trades,
+  symbol: 't'.concat(ETHUSD),
+});
+
+export const allPairNamesChannels = {
+  bookBTCUSD: 'book'.concat(BTCUSD),
+  bookETHUSD: 'book'.concat(ETHUSD),
+  tradesBTCUSD: 'trades'.concat(BTCUSD),
+  tradesETHUSD: 'trades'.concat(ETHUSD),
+};
+
 export const allPairNames = {
   BTCUSD,
   ETHUSD,
 };
+
 export const hbValues = 'hb';
+export const tradeState = {
+  te: 'te',
+  tu: 'tu',
+};
+export const typeOperation = {
+  BUY: 'BUY',
+  SELL: 'SELL',
+};
+
+export const channel = {
+  trades,
+  book,
+};
